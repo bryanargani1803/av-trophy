@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AV TROPHY // THE VANGUARD PROTOCOL</title>
+  <style>
+    :root {
+      --bg-base: #07090e;
+      --bg-card: #0f131d;
+      --bg-card-hover: #151b29;
+      --border: #222b3d;
+      --gold: #f5b942;
+      --gold-glow: rgba(245, 185, 66, 0.25);
+      --crimson: #ff3b5c;
+      --crimson-bg: rgba(255, 59, 92, 0.08);
+      --emerald: #10b981;
+      --emerald-bg: rgba(16, 185, 129, 0.08);
+      --cyan: #00e5ff;
+      --text-main: #f1f5f9;
+      --text-muted: #8b9bb4;
+      --font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+      --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      line-height: 1.5;
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* TOP TROPHY BANNER */
+    .header-banner {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(135deg, #111624 0%, #090c14 100%);
+      border: 1px solid var(--gold);
+      box-shadow: 0 0 25px var(--gold-glow);
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      gap: 16px;
+    }
+
+    .trophy-title {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .trophy-icon {
+      font-size: 2.5rem;
+      filter: drop-shadow(0 0 10px var(--gold));
+    }
+
+    .trophy-title h1 {
+      font-size: 1.5rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 800;
+    }
+
+    .trophy-title p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .status-pill {
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+    }
+
+    /* COUNTDOWN SECTION */
+    .countdown-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .timer-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      max-width: 720px;
+      margin: 0 auto 20px auto;
+    }
+
+    .time-box {
+      background: #080b11;
+      border: 1px solid #1d2536;
+      border-radius: 10px;
+      padding: 16px 8px;
+    }
+
+    .time-val {
+      font-family: var(--font-mono);
+      font-size: clamp(1.8rem, 5vw, 3.2rem);
+      font-weight: 800;
+      color: var(--cyan);
+      line-height: 1.1;
+    }
+
+    .time-unit {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    .progress-bar-wrap {
+      background: #080b11;
+      height: 8px;
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid #1d2536;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--cyan), var(--gold));
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+
+    /* LEADERBOARD & CONTROLS */
+    .grid-2col {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+
+    @media (max-width: 860px) {
+      .grid-2col {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+    }
+
+    .card h2 {
+      font-size: 1.15rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .competitor-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #090c14;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px;
+      margin-bottom: 14px;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .competitor-row.rank-1 {
+      border-color: var(--gold);
+      background: linear-gradient(90deg, rgba(245, 185, 66, 0.08) 0%, #090c14 100%);
+    }
+
+    .comp-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .rank-badge {
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      font-weight: 800;
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #161d2b;
+      color: var(--text-muted);
+    }
+
+    .rank-1 .rank-badge {
+      background: var(--gold);
+      color: #000;
+    }
+
+    .comp-name {
+      font-weight: 700;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .comp-sub {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .comp-networth {
+      font-family: var(--font-mono);
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .rank-1 .comp-networth {
+      color: var(--gold);
+    }
+
+    .gap-box {
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: 8px;
+      background: #080b11;
+      border: 1px dashed var(--border);
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* INPUT CONTROLS */
+    .control-group {
+      margin-bottom: 16px;
+    }
+
+    .control-group label {
+      display: block;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    input[type="number"] {
+      flex: 1;
+      background: #080b11;
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      font-family: var(--font-mono);
+      font-size: 1rem;
+      padding: 12px 14px;
+      border-radius: 8px;
+      outline: none;
+    }
+
+    input[type="number"]:focus {
+      border-color: var(--cyan);
+    }
+
+    .btn {
+      background: var(--cyan);
+      color: #000;
+      border: none;
+      font-weight: 700;
+      padding: 12px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: opacity 0.15s;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      opacity: 0.9;
+    }
+
+    .btn-secondary {
+      background: #192233;
+      color: var(--text-main);
+      border: 1px solid var(--border);
+    }
+
+    .quick-btns {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .quick-btns button {
+      background: #121826;
+      border: 1px solid var(--border);
+      color: var(--emerald);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      padding: 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .quick-btns button:hover {
+      background: var(--emerald-bg);
+      border-color: var(--emerald);
+    }
+
+    /* INVERSION PROTOCOL SECTION */
+    .inversion-header {
+      margin-bottom: 18px;
+    }
+
+    .inversion-header h2 {
+      font-size: 1.3rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-main);
+    }
+
+    .inversion-header p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .inversion-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 860px) {
+      .inversion-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .inv-col-trap {
+      background: var(--crimson-bg);
+      border: 1px solid rgba(255, 59, 92, 0.35);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .inv-col-shield {
+      background: var(--emerald-bg);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .inv-col-title {
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .inv-col-trap .inv-col-title {
+      color: var(--crimson);
+    }
+
+    .inv-col-shield .inv-col-title {
+      color: var(--emerald);
+    }
+
+    .rule-item {
+      background: rgba(7, 9, 14, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+
+    .rule-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .rule-num {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .inv-col-trap .rule-num {
+      color: var(--crimson);
+    }
+
+    .inv-col-shield .rule-num {
+      color: var(--emerald);
+    }
+
+    .rule-title {
+      font-weight: 700;
+      font-size: 0.98rem;
+      margin-bottom: 6px;
+      color: var(--text-main);
+    }
+
+    .rule-desc {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--emerald);
+      color: #000;
+      font-weight: 700;
+      padding: 12px 20px;
+      border-radius: 8px;
+      display: none;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP BANNER -->
+  <header class="header-banner">
+    <div class="trophy-title">
+      <div class="trophy-icon">🏆</div>
+      <div>
+        <h1>AV Trophy Championship</h1>
+        <p>Winner-Takes-All Final Deadline: May 1, 2027 (00:00:00)</p>
+      </div>
+    </div>
+    <div class="status-pill" id="trophyHolderBanner">
+      CURRENT HOLDER: JONATHAN HOU
+    </div>
+  </header>
+
+  <!-- LIVE STOPWATCH / COUNTDOWN -->
+  <section class="countdown-card">
+    <span class="section-label">Time Remaining Until May 1, 2027 Lockout</span>
+    <div class="timer-grid">
+      <div class="time-box">
+        <div class="time-val" id="cd-days">000</div>
+        <div class="time-unit">Days</div>
+      </div>
+      <div class="time-box">
+        <div class="time-val" id="cd-hours">00</div>
+        <div class="time-unit">Hours</div>
+      </div>
+      <div class="time-box">
+        <div class="time-val" id="cd-mins">00</div>
+        <div class="time-unit">Minutes</div>
+      </div>
+      <div class="time-box">
+        <div class="time-val" id="cd-secs">00</div>
+        <div class="time-unit">Seconds</div>
+      </div>
+    </div>
+    <div class="progress-bar-wrap" title="Time Elapsed">
+      <div class="progress-bar-fill" id="timeProgressBar"></div>
+    </div>
+  </section>
+
+  <!-- LEADERBOARD & SCORE CONTROLLER -->
+  <div class="grid-2col">
+    <!-- LEADERBOARD -->
+    <div class="card">
+      <h2>
+        <span>Live Standings</span>
+        <span style="font-size: 0.75rem; font-family: var(--font-mono); color: var(--gold);">PRIZE: AV TROPHY</span>
+      </h2>
+
+      <div id="leaderboardContainer"></div>
+
+      <div class="gap-box">
+        <span id="gapLabel">GAP TO OVERTAKE #1:</span>
+        <strong id="gapValue" style="color: var(--crimson);">$1,000,000</strong>
+      </div>
+      <div class="gap-box" style="margin-top: 8px; border-style: solid;">
+        <span>JONATHAN'S NEXT +$12,000 END-OF-MONTH BOOST:</span>
+        <strong id="nextBoostLabel" style="color: var(--cyan);">Nov 30, 2026</strong>
+      </div>
+    </div>
+
+    <!-- SCORE UPDATER -->
+    <div class="card">
+      <h2>Update Your Net Worth</h2>
+      <div class="control-group">
+        <label for="exactScoreInput">Set Exact Current Net Worth ($ USD)</label>
+        <div class="input-row">
+          <input type="number" id="exactScoreInput" placeholder="e.g. 45000" min="0" step="100" />
+          <button class="btn" onclick="setExactScore()">Set Score</button>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label for="addScoreInput">Or Add/Subtract Delta ($ USD)</label>
+        <div class="input-row">
+          <input type="number" id="addScoreInput" placeholder="e.g. 2500" step="100" />
+          <button class="btn btn-secondary" onclick="addDeltaScore()">+ Add</button>
+        </div>
+        <div class="quick-btns">
+          <button onclick="quickAdd(500)">+$500</button>
+          <button onclick="quickAdd(1000)">+$1,000</button>
+          <button onclick="quickAdd(5000)">+$5,000</button>
+          <button onclick="quickAdd(10000)">+$10,000</button>
+        </div>
+      </div>
+
+      <hr style="border: none; border-top: 1px solid var(--border); margin: 18px 0;" />
+
+      <div class="control-group" style="margin-bottom: 0;">
+        <label>Multi-Device Sync (Mac / Windows / Phone)</label>
+        <div class="input-row">
+          <button class="btn btn-secondary" style="width: 100%;" onclick="copySyncLink()">
+            🔗 Copy Sync Link With Current Score
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHARLIE MUNGER INVERSION PROTOCOL -->
+  <section class="card">
+    <div class="inversion-header">
+      <h2>Inversion Protocol: Reverse-Engineering The Coiled Serpent</h2>
+      <p>
+        "Invert, always invert." Instead of only asking how to win, identify every mechanism that causes the masses to fail—and cut it off at the root.
+      </p>
+    </div>
+
+    <div class="inversion-grid">
+      <!-- LEFT: HOW TO FAIL (THE MASSES) -->
+      <div class="inv-col-trap">
+        <div class="inv-col-title">❌ How to Guarantee Defeat (What the Masses Do)</div>
+
+        <div class="rule-item">
+          <span class="rule-num">Failure Mechanism #1</span>
+          <div class="rule-title">Feed Impulses with Memory & Anticipation</div>
+          <div class="rule-desc">
+            Allowing a fleeting bodily sensation to be amplified by replaying past sexual memories or fantasizing about future gratification, turning a simple appetite into an insatiable desire.
+          </div>
+        </div>
+
+        <div class="rule-item">
+          <span class="rule-num">Failure Mechanism #2</span>
+          <div class="rule-title">Practice "Unchaste Continence" (Edging / Fantasizing)</div>
+          <div class="rule-desc">
+            Abstaining physically while still indulging in erotic daydreams, visual lingering, or physical dalliance—which irritates the sex glands, blocks internal hormones, and drains nervous tone.
+          </div>
+        </div>
+
+        <div class="rule-item">
+          <span class="rule-num">Failure Mechanism #3</span>
+          <div class="rule-title">Let the 5 Senses Smuggle Contraband into the Mind</div>
+          <div class="rule-desc">
+            Allowing the eyes and ears to consume suggestive screens, erotic content, and salacious entertainment, keeping the sexual glands artificially overstimulated like a dairy cow's glands.
+          </div>
+        </div>
+
+        <div class="rule-item">
+          <span class="rule-num">Failure Mechanism #4</span>
+          <div class="rule-title">Fall for the "Moderation" & "Biological Necessity" Lie</div>
+          <div class="rule-desc">
+            Believing that "moderate" sexual release is healthy or mistaking temporary habit-withdrawal discomfort for a physical necessity, which keeps the addiction loop alive forever.
+          </div>
+        </div>
+
+        <div class="rule-item">
+          <span class="rule-num">Failure Mechanism #5</span>
+          <div class="rule-title">Drift to Sleep with an Unarmed Mind</div>
+          <div class="rule-desc">
+            Going to bed after entertaining sensual thoughts or mindless scrolling, disabling the internal "censor" during sleep and triggering nocturnal energy losses.
+          </div>
+        </div>
+
+        <div class="rule-item">
+          <span class="rule-num">Failure Mechanism #6</span>
+          <div class="rule-title">Leak Conserved Energy into Small Talk & Pleasure-Eating</div>
+          <div class="rule-desc">
+            Saving sexual energy only to fritter it away in endless small talk, petty personal drama, worry, and overeating rich foods for taste-gratification.
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: THE VANGUARD INVERSION (WHAT TO CUT & DO) -->
+      <div class="inv-col-shield">
+        <div class="inv-col-title">⚡ The Vanguard Inversion (What You Cut Out to Win)</div>
+
+        <div class="rule-item">
+          <span class="rule-num">Inversion Rule #1 // Mental Chastity</span>
+          <div class="rule-title">Cut Every Sexual Thought the Instant It Arises</div>
+          <div class="rule-desc">
+            Sever memory and anticipation at the very first second. Without mental fuel, the impulse cannot become desire and the brain retains 100% of its cerebral voltage.
+          </div>
+        </div>
+
+        <div class="rule-item">
+          <span class="rule-num">Inversion Rule #2 // Non-Formation</span>
+          <div class="rule-title">Stop External Fluid Formation at the Source</div>
+          <div class="rule-desc">
+            Eliminate all mental and tactile irritation so the gonads stop overproducing external fluid and dedicate the richest elements of your blood to internal hormones for brain power and drive.
+          </div>
+        </div>
+
+        <div class="rule-item">
+          <span class="rule-num">Inversion Rule #3 // Sensory Quarantine</span>
+          <div class="rule-title">Enforce Strict Military Command Over Your 5 Senses</div>
+          <div class="rule-desc">
+            Cut out all erotic media, suggestive feeds, and visual wandering immediately. Your senses exist strictly as scouts to report objective data to your reason.
+          </div>
+        </div>
+
+        <div class="rule-item">
+          <span class="rule-num">Inversion Rule #4 // Total Elimination</span>
+          <div class="rule-title">Ignore Withdrawal Discomfort Until Indifference Sets In</div>
+          <div class="rule-desc">
+            Treat any physical restlessness as a temporary habit protest. Refuse every small concession; the longer you hold pure continence, the faster calm sexual indifference locks in.
+          </div>
+        </div>
+
+        <div class="rule-item">
+          <span class="rule-num">Inversion Rule #5 // Pre-Sleep Lockdown</span>
+          <div class="rule-title">Program Your Last Waking Thought Before Sleep</div>
+          <div class="rule-desc">
+            Because your final thought before slumber governs the night state, feed your mind noble, high-level concepts before bed and command your inner censor to stay on guard all night.
+          </div>
+        </div>
+
+        <div class="rule-item">
+          <span class="rule-num">Inversion Rule #6 // Aggressive Transmutation</span>
+          <div class="rule-title">Cut Trivialities & Channel All Force into Deep Execution</div>
+          <div class="rule-desc">
+            Cut out endless small talk, worry, and taste-gluttony. Immediately pour your conserved nervous energy into single-pointed concentration and high-leverage wealth creation.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="toast" id="toastMsg">Sync Link Copied to Clipboard!</div>
+
+  <script>
+    // 1. TIMESTAMPS & CONSTANTS
+    const START_DATE = new Date('2026-11-09T00:00:00').getTime();
+    const END_DATE   = new Date('2027-05-01T00:00:00').getTime();
+
+    // End-of-month timestamps when Jonathan Hou gets +$12,000 USD
+    const MONTH_ENDS = [
+      { date: new Date('2026-11-30T23:59:59').getTime(), label: 'Nov 30, 2026' },
+      { date: new Date('2026-12-31T23:59:59').getTime(), label: 'Dec 31, 2026' },
+      { date: new Date('2027-01-31T23:59:59').getTime(), label: 'Jan 31, 2027' },
+      { date: new Date('2027-02-28T23:59:59').getTime(), label: 'Feb 28, 2027' },
+      { date: new Date('2027-03-31T23:59:59').getTime(), label: 'Mar 31, 2027' },
+      { date: new Date('2027-04-30T23:59:59').getTime(), label: 'Apr 30, 2027' }
+    ];
+
+    const JONATHAN_BASE = 1000000;
+    const JONATHAN_MONTHLY_INC = 12000;
+    const STORAGE_KEY = 'av_trophy_user_networth';
+
+    // 2. INITIALIZE USER SCORE (Check URL param first for cross-device sync, then localStorage)
+    function initUserScore() {
+      const params = new URLSearchParams(window.location.search);
+      if (params.has('score')) {
+        const urlScore = parseFloat(params.get('score'));
+        if (!isNaN(urlScore) && urlScore >= 0) {
+          localStorage.setItem(STORAGE_KEY, urlScore);
+          return urlScore;
+        }
+      }
+      const saved = localStorage.getItem(STORAGE_KEY);
+      return saved ? parseFloat(saved) : 0;
+    }
+
+    let userScore = initUserScore();
+    document.getElementById('exactScoreInput').value = userScore;
+
+    // 3. CALCULATE JONATHAN HOU'S NET WORTH
+    function getJonathanStatus(now) {
+      let monthsPassed = 0;
+      let nextBoost = 'Completed (Max Reached)';
+      for (let i = 0; i < MONTH_ENDS.length; i++) {
+        if (now >= MONTH_ENDS[i].date) {
+          monthsPassed++;
+        } else {
+          nextBoost = MONTH_ENDS[i].label + ' (+$12,000)';
+          break;
+        }
+      }
+      return {
+        netWorth: JONATHAN_BASE + (monthsPassed * JONATHAN_MONTHLY_INC),
+        monthsPassed,
+        nextBoost
+      };
+    }
+
+    function formatUSD(num) {
+      return '$' + Math.round(num).toLocaleString('en-US');
+    }
+
+    // 4. RENDER LEADERBOARD
+    function renderLeaderboard() {
+      const now = Date.now();
+      const jStatus = getJonathanStatus(now);
+      const jWorth = jStatus.netWorth;
+
+      document.getElementById('nextBoostLabel').textContent = jStatus.nextBoost;
+
+      const competitors = [
+        {
+          id: 'jonathan',
+          name: 'Jonathan Hou',
+          sub: `Base $1M + $${(jStatus.monthsPassed * 12)}k (${jStatus.monthsPassed} mo. elapsed)`,
+          worth: jWorth
+        },
+        {
+          id: 'user',
+          name: 'YOU (Challenger)',
+          sub: 'Starting from $0 // Vanguard Protocol',
+          worth: userScore
+        }
+      ];
+
+      competitors.sort((a, b) => b.worth - a.worth);
+
+      const container = document.getElementById('leaderboardContainer');
+      container.innerHTML = competitors.map((comp, index) => {
+        const isFirst = index === 0;
+        return `
+          <div class="competitor-row ${isFirst ? 'rank-1' : ''}">
+            <div class="comp-left">
+              <div class="rank-badge">#${index + 1}</div>
+              <div>
+                <div class="comp-name">
+                  ${comp.name} ${isFirst ? '<span>🏆</span>' : ''}
+                </div>
+                <div class="comp-sub">${comp.sub}</div>
+              </div>
+            </div>
+            <div class="comp-networth">${formatUSD(comp.worth)}</div>
+          </div>
+        `;
+      }).join('');
+
+      const banner = document.getElementById('trophyHolderBanner');
+      const gapLabel = document.getElementById('gapLabel');
+      const gapValue = document.getElementById('gapValue');
+
+      if (userScore > jWorth) {
+        banner.textContent = '🏆 CURRENT HOLDER: YOU (LEADING)';
+        banner.style.borderColor = 'var(--emerald)';
+        banner.style.color = 'var(--emerald)';
+        gapLabel.textContent = 'YOUR LEAD OVER JONATHAN HOU:';
+        gapValue.textContent = '+' + formatUSD(userScore - jWorth);
+        gapValue.style.color = 'var(--emerald)';
+      } else {
+        banner.textContent = 'CURRENT HOLDER: JONATHAN HOU';
+        banner.style.borderColor = 'var(--crimson)';
+        banner.style.color = 'var(--crimson)';
+        gapLabel.textContent = 'DEFICIT TO OVERTAKE #1 (AV TROPHY):';
+        gapValue.textContent = formatUSD((jWorth - userScore) + 1);
+        gapValue.style.color = 'var(--crimson)';
+      }
+    }
+
+    // 5. SCORE UPDATE HANDLERS
+    function saveAndRefresh(newVal) {
+      userScore = Math.max(0, newVal);
+      localStorage.setItem(STORAGE_KEY, userScore);
+      document.getElementById('exactScoreInput').value = userScore;
+      const url = new URL(window.location);
+      url.searchParams.set('score', userScore);
+      window.history.replaceState({}, '', url);
+      renderLeaderboard();
+    }
+
+    function setExactScore() {
+      const val = parseFloat(document.getElementById('exactScoreInput').value);
+      if (!isNaN(val)) saveAndRefresh(val);
+    }
+
+    function addDeltaScore() {
+      const delta = parseFloat(document.getElementById('addScoreInput').value);
+      if (!isNaN(delta)) {
+        saveAndRefresh(userScore + delta);
+        document.getElementById('addScoreInput').value = '';
+      }
+    }
+
+    function quickAdd(amount) {
+      saveAndRefresh(userScore + amount);
+    }
+
+    function copySyncLink() {
+      const url = new URL(window.location.href);
+      url.searchParams.set('score', userScore);
+      navigator.clipboard.writeText(url.toString()).then(() => {
+        const toast = document.getElementById('toastMsg');
+        toast.style.display = 'block';
+        setTimeout(() => { toast.style.display = 'none'; }, 2500);
+      });
+    }
+
+    // 6. LIVE COUNTDOWN CLOCK
+    function updateClock() {
+      const now = Date.now();
+      const diff = Math.max(0, END_DATE - now);
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const mins = Math.floor((diff / (1000 * 60)) % 60);
+      const secs = Math.floor((diff / 1000) % 60);
+
+      document.getElementById('cd-days').textContent = String(days).padStart(3, '0');
+      document.getElementById('cd-hours').textContent = String(hours).padStart(2, '0');
+      document.getElementById('cd-mins').textContent = String(mins).padStart(2, '0');
+      document.getElementById('cd-secs').textContent = String(secs).padStart(2, '0');
+
+      const totalDuration = END_DATE - START_DATE;
+      const elapsed = Math.min(totalDuration, Math.max(0, now - START_DATE));
+      const pct = (elapsed / totalDuration) * 100;
+      document.getElementById('timeProgressBar').style.width = pct.toFixed(2) + '%';
+
+      renderLeaderboard();
+    }
+
+    updateClock();
+    setInterval(updateClock, 1000);
+  </script>
+</body>
+</html>
